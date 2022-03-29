@@ -2,9 +2,13 @@ import { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 
+import data from '../../data/items.json';
+
 import styles from './HomePage.module.scss';
 
 export const HomePage: NextPage = () => {
+    const { items } = data;
+
     return (
         <div className={styles.container}>
             <Head>
@@ -24,33 +28,19 @@ export const HomePage: NextPage = () => {
                 </p>
 
                 <div className={styles.grid}>
-                    <a href="https://nextjs.org/docs" className={styles.card}>
-                        <h2>Documentation &rarr;</h2>
-                        <p>Find in-depth information about Next.js features and API.</p>
-                    </a>
+                    {items.map(item => (
+                        <a
+                            key={item.id}
+                            href={item.wikiUrl}
+                            className={styles.card}
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <h2>{item.name}</h2>
+                            <p>{item.caption}</p>
+                        </a>
+                    ))}
 
-                    <a href="https://nextjs.org/learn" className={styles.card}>
-                        <h2>Learn &rarr;</h2>
-                        <p>Learn about Next.js in an interactive course with quizzes!</p>
-                    </a>
-
-                    <a
-                        href="https://github.com/vercel/next.js/tree/canary/examples"
-                        className={styles.card}
-                    >
-                        <h2>Examples &rarr;</h2>
-                        <p>Discover and deploy boilerplate example Next.js projects.</p>
-                    </a>
-
-                    <a
-                        href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-                        className={styles.card}
-                    >
-                        <h2>Deploy &rarr;</h2>
-                        <p>
-                            Instantly deploy your Next.js site to a public URL with Vercel.
-                        </p>
-                    </a>
                 </div>
             </main>
 
