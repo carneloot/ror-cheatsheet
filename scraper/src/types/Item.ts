@@ -1,5 +1,7 @@
 import { Rarity } from '../enum/Rarity';
 import { Category } from '../enum/Category';
+
+import { UnlockInfo } from './UnlockInfo';
 import { Stat } from './Stat';
 
 export type Item = {
@@ -12,4 +14,5 @@ export type Item = {
     rarity: Rarity;
     categories: Category[];
     stats: Stat[];
+    unlock?: UnlockInfo;
 };

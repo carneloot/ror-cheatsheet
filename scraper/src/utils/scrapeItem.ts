@@ -9,13 +9,14 @@ import { Category } from '../enum/Category';
 import { StatStack } from '../enum/StatStack';
 
 import { consoleDump } from './consoleDump';
+import { scrapeItemUnlock } from './scrapeItemUnlock';
 
 const allCategories = Object.values(Category) as string[];
 
-export const scrapeItemLink = async (browser: Browser, { index, name, url }: ItemLink): Promise<Item> => {
+export const scrapeItem = async (browser: Browser, { index, name, url }: ItemLink): Promise<Item> => {
     const page = await browser.newPage();
     await page.goto(url);
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
 
     page.on('console', consoleDump);
 
@@ -69,6 +70,7 @@ export const scrapeItemLink = async (browser: Browser, { index, name, url }: Ite
 
         const rarityTd = findTdFromLabel('Rarity');
         const categoryTd = findTdFromLabel('Category');
+        const unlockTd = findTdFromLabel('Unlock');
 
         let categories: Category[] = [];
         const possibleCategories = categoryTd?.innerText.toLowerCase().split('\n') ?? [];
@@ -85,14 +87,21 @@ export const scrapeItemLink = async (browser: Browser, { index, name, url }: Ite
             name: infobox.querySelector<HTMLDivElement>('.infoboxname > div + div')?.innerText,
             imageSrc: infobox.querySelector<HTMLImageElement>('td > img')?.src,
             caption: infobox.querySelector<HTMLTableCellElement>('.infoboxcaption')?.innerText,
-            description: infobox.querySelector('.infoboxdesc')?.innerHTML,
+            description: infobox.querySelector<HTMLTableCellElement>('.infoboxdesc')?.innerText,
             rarity: rarityTd?.innerText.toLowerCase() as Rarity,
             categories,
             stats: retrieveStats(),
+            unlock: unlockTd
+                ? { url: unlockTd.querySelector('a')?.href }
+                : undefined,
         } as Item;
     }, allCategories, name);
 
     await page.close();
+
+    if (item.unlock) {
+        item.unlock = await scrapeItemUnlock(browser, item.unlock.url);
+    }
 
     return {
         ...item,
