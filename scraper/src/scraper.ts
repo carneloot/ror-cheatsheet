@@ -8,7 +8,7 @@ import { scrapeItem } from './utils/scrapeItem';
 import { PromisePool } from '@supercharge/promise-pool';
 
 const ITEMS_PAGE = 'https://riskofrain2.fandom.com/wiki/Items';
-const CONCURRENT_LIMIT = 8;
+const CONCURRENT_LIMIT = 15;
 
 (async function () {
     const browser = await connect({
@@ -35,12 +35,21 @@ const CONCURRENT_LIMIT = 8;
 
     await page.close();
 
+    console.log(`Found ${itemLinks.length} items`);
+
     const { results: items } = await PromisePool
         .for(itemLinks)
         .withConcurrency(CONCURRENT_LIMIT)
         .process((itemLink) => scrapeItem(browser, itemLink));
 
-    writeFileSync('./items.json', JSON.stringify({ items }, null, 4));
-
     await browser.close();
+
+    const data = {
+        items,
+    };
+
+    console.log('Writing data.json file...');
+
+    writeFileSync('./data.json', JSON.stringify(data, null, 4));
+
 })();

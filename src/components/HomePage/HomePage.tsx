@@ -2,7 +2,7 @@ import { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 
-import data from '../../data/items.json';
+import data from '../../data/data.json';
 
 import styles from './HomePage.module.scss';
 
